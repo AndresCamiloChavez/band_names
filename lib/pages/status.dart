@@ -12,7 +12,7 @@ class StatusPage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Text('Server status: ${socketProvider.serverStatus}'),
+            Text('Server status:  ${socketProvider.serverStatus}'),
           ],
         ),
       ),
