@@ -6,34 +6,36 @@ enum ServerStatus { Online, Offline, Connecting }
 
 class SocketService with ChangeNotifier {
   ServerStatus _serverStatus = ServerStatus.Connecting;
+  late Socket _socket;
 
-  get serverStatus => _serverStatus;
+  ServerStatus get serverStatus => _serverStatus;
+  Socket get socket => _socket;
+
   SocketService() {
     _initConfig();
   }
 
   void _initConfig() {
-    Socket socket = io(
-        'http://192.168.10.15:3000',
+   _socket = io(
+        'http://192.168.0.6:3000',
         OptionBuilder().setTransports(['websocket']) // for Flutter or Dart VM
             .build());
 
-    socket.onConnect((_) {
+    _socket.onConnect((_) {
       _serverStatus = ServerStatus.Online;
       notifyListeners();
       print('connect');
     });
-    socket.onDisconnect((_) {
+    _socket.onDisconnect((_) {
       _serverStatus = ServerStatus.Offline;
       notifyListeners();
       print('Disconnect');
-
     });
-    socket.on('nuevo',(_) {
-      _serverStatus = ServerStatus.Offline;
-      notifyListeners();
-      print('Nuevo mensaje');
-
-    });
+    
+    // socket.on('nuevo',(_) {
+    //   _serverStatus = ServerStatus.Offline;
+    //   notifyListeners();
+    //   print('Nuevo mensaje');
+    // });
   }
 }
