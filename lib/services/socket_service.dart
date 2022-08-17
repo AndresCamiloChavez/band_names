@@ -17,7 +17,7 @@ class SocketService with ChangeNotifier {
 
   void _initConfig() {
    _socket = io(
-        'http://192.168.0.6:3000',
+        'http://localhost:3000',
         OptionBuilder().setTransports(['websocket']) // for Flutter or Dart VM
             .build());
 
