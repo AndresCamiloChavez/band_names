@@ -5,6 +5,7 @@ import 'package:band_names/models/band.dart';
 import 'package:band_names/services/socket_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,15 +22,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     final socketService = Provider.of<SocketService>(context, listen: false);
 
-    socketService.socket.on('bands', (data) {
-      bands.clear();
-      (data['bands'] as List<dynamic>).forEach((element) {
-        bands.add(Band.fromMap(element));
-      });
-      setState(() {});
-    });
+    socketService.socket.on('bands', _handlerActiveBands);
 
     super.initState();
+  }
+
+  _handlerActiveBands(dynamic data) {
+    bands.clear();
+    (data['bands'] as List<dynamic>).forEach((element) {
+      bands.add(Band.fromMap(element));
+    });
+    setState(() {});
   }
 
   @override
@@ -58,8 +61,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: ListView.builder(
-          itemCount: bands.length, itemBuilder: (_, i) => _bandTile(bands[i])),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 200,
+            child: _showGraph(),
+          ),
+          Expanded(
+            child: ListView.builder(
+                itemCount: bands.length,
+                itemBuilder: (_, i) => _bandTile(bands[i])),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: addNewBand,
         child: const Icon(Icons.add),
@@ -166,5 +181,53 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Navigator.pop(context);
+  }
+
+  Widget _showGraph() {
+    Map<String, double> dataMap = {
+      // "Flutter": 5,
+      // "React": 3,
+      // "Xamarin": 2,
+      // "Ionic": 2,
+    };
+    bands.forEach((element) {
+      dataMap.putIfAbsent(element.name, () => element.votes.toDouble());
+    });
+    final List<Color> colorList = [
+      Color(0xff23424f),
+      Color.fromARGB(255, 49, 151, 195),
+      Color.fromARGB(255, 23, 136, 185),
+      Color.fromARGB(255, 16, 115, 157),
+      Color.fromARGB(255, 189, 217, 229)
+    ];
+    return PieChart(
+      dataMap: dataMap,
+      animationDuration: Duration(milliseconds: 800),
+      chartLegendSpacing: 32,
+      chartRadius: MediaQuery.of(context).size.width / 3.2,
+      colorList: colorList,
+      initialAngleInDegree: 0,
+      chartType: ChartType.ring,
+      ringStrokeWidth: 32,
+      centerText: "HYBRID",
+      legendOptions: LegendOptions(
+        showLegendsInRow: false,
+        legendPosition: LegendPosition.right,
+        showLegends: true,
+        // legendShape: _BoxShape.circle,´
+        legendTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      chartValuesOptions: ChartValuesOptions(
+        showChartValueBackground: true,
+        showChartValues: true,
+        showChartValuesInPercentage: false,
+        showChartValuesOutside: false,
+        decimalPlaces: 1,
+      ),
+      // gradientList: ---To add gradient colors---
+      // emptyColorGradient: ---Empty Color gradient---
+    );
   }
 }
