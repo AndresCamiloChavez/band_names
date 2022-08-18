@@ -75,7 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
       key: Key(band.id),
       direction: DismissDirection.startToEnd,
       onDismissed: (direction) {
-        print('LOG  ${1}');
+        socketService.socket.emit('delete-band', band.id);
+        print('LOG eliminar banda ${band.id}');
       },
       background: GestureDetector(
         child: Container(
@@ -162,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (name.length > 1) {
       socketService.socket.emit('addBand', name);
       bands.add(Band(id: '${bands.length}', name: name, votes: 3));
-      // setState(() {});
     }
 
     Navigator.pop(context);
