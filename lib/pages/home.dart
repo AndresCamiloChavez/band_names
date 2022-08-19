@@ -56,13 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   : const Icon(Icons.network_check, color: Colors.red))
         ],
         title: const Text(
-          'BandNames',
+          'Name',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
       ),
       body: Column(
         children: [
+          if(bands.length > 0)
           Container(
             width: double.infinity,
             height: 200,
@@ -133,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (_) {
             return AlertDialog(
-              title: const Text('New band name: '),
+              title: const Text('New name: '),
               content: TextField(
                 controller: textController,
               ),
